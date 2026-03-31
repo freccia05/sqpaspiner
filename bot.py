@@ -55,4 +55,24 @@ async def pickName(ctx):
     data["namesleft"].remove(name)
     save_data(data)
     await ctx.send(f"Congrats! {name} has been picked to complete the merge request!")
+
+
+@bot.command()
+async def resetNames(ctx):
+    data = load_data()
+    data["namesleft"] = data["names"].copy()
+    save_data(data)
+    await ctx.send("The list of names has been reset.")
+
+@bot.command()
+async def help(ctx):
+    help_message = """
+    **Available Commands:**
+    `!ping` - get doxxed
+    `!addname <name>` - Add a name to the list.
+    `!pickName` - Pick a random name from the list.
+    `!resetNames` - Reset the list of names.
+    `!help` - help
+    """
+    await ctx.send(help_message)
 bot.run(TOKEN)
