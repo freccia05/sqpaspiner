@@ -56,6 +56,10 @@ async def pickName(ctx):
     save_data(data)
     await ctx.send(f"Congrats! {name} has been picked to complete the merge request!")
 
+@bot.command()
+async def remainingNames(ctx):
+    data = load_data()
+    await ctx.send(f"Remaining names: {', '.join(data['namesleft'])}")
 
 @bot.command()
 async def resetNames(ctx):
@@ -72,7 +76,8 @@ async def spqahelp(ctx):
     `!addname <name>` - Add a name to the list.
     `!pickName` - Pick a random name from the list.
     `!resetNames` - Reset the list of names.
-    `!help` - help
+    `!remainingNames` - Show the remaining names.
+    `!spqahelp` - Show this help message.
     """
     await ctx.send(help_message)
 bot.run(TOKEN)
