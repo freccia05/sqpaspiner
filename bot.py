@@ -65,7 +65,7 @@ async def resetNames(ctx):
     await ctx.send("The list of names has been reset.")
 
 @bot.command()
-async def help(ctx):
+async def spqahelp(ctx):
     help_message = """
     **Available Commands:**
     `!ping` - get doxxed
