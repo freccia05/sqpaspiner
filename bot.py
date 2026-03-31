@@ -17,6 +17,7 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
@@ -32,19 +33,8 @@ async def on_ready():
 
 @bot.command()
 async def ping(ctx):
-    await ctx.send("Your Coordinates are 40.376188, -80.623031")
+    await ctx.send("bruh")
 
-
-@bot.command()
-async def addname(ctx, *, name):
-    data = load_data()
-    if name in data["names"]:
-        await ctx.send(f"{name} is already in the list.")
-        return
-    data["names"].append(name)
-    data["namesleft"].append(name)
-    save_data(data)
-    await ctx.send(f"Added {name} to the list.")
 
 @bot.command()
 async def pickName(ctx):
@@ -54,12 +44,23 @@ async def pickName(ctx):
     name = pick_random_name(data["namesleft"])
     data["namesleft"].remove(name)
     save_data(data)
-    await ctx.send(f"Congrats! {name} has been picked to complete the merge request!")
+
+    usermention = ctx.guild.get_member(name)
+    await ctx.send(f"Congrats! {usermention.mention} has been picked to complete the merge request!")
 
 @bot.command()
 async def remainingNames(ctx):
     data = load_data()
-    await ctx.send(f"Remaining names: {', '.join(data['namesleft'])}")
+    mentions = []
+
+    for name_id in data["namesleft"]:
+        member = ctx.guild.get_member(name_id)
+        if member is not None:
+            mentions.append(member.name)
+        else:
+            mentions.append(f"`{name_id}` (not in server)")
+
+    await ctx.send("Remaining members:\n" + "\n".join(mentions))
 
 @bot.command()
 async def resetNames(ctx):
@@ -73,11 +74,35 @@ async def spqahelp(ctx):
     help_message = """
     **Available Commands:**
     `!ping` - get doxxed
-    `!addname <name>` - Add a name to the list.
     `!pickName` - Pick a random name from the list.
     `!resetNames` - Reset the list of names.
     `!remainingNames` - Show the remaining names.
     `!spqahelp` - Show this help message.
+    `!addall` - Add all members of the server to the list (excluding bots and the bot itself).
     """
     await ctx.send(help_message)
+
+
+
+@bot.command()
+async def addall(ctx):
+    data = load_data()
+
+    existing = set(data["names"])
+    added = 0
+
+    for member in ctx.guild.members:
+        if member.bot:
+            continue
+        if member.id == 913527606954053673:
+            continue
+        if member.id not in existing:
+            data["names"].append(member.id)
+            data["namesleft"].append(member.id)
+            added += 1
+
+    save_data(data)
+    await ctx.send(f"Added {added} members from this server.")
+
+
 bot.run(TOKEN)
